@@ -7,6 +7,7 @@ use App\Http\Requests\AuthRequest;
 use App\Http\Requests\LoginRequest;
 use App\Mail\SendOtpMail;
 use App\Models\UserLogin;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,11 @@ class AuthController extends Controller
 {
     protected $otpExpiryMinutes = 5;
     protected $resendThrottleSeconds = 60;
+    protected $userService;
+
+    public function __construct(UserService $userService) {
+        $this->userService  = $userService;
+    }
 
     public function login(LoginRequest $request) {
         $credentials = [
@@ -76,30 +82,30 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request)
     {
-        $user = UserLogin::where('email', $request->email)->first();
+        $user_login = UserLogin::where('email', $request->email)->first();
 
-        if (!$user) {
+        if (!$user_login) {
             return back()->withErrors(['email' => 'Email không tồn tại'])->withInput();
         }
 
         // kiểm tra thời hạn
-        if (!$user->otp_expires_at || Carbon::now()->gt($user->otp_expires_at)) {
+        if (!$user_login->otp_expires_at || Carbon::now()->gt($user_login->otp_expires_at)) {
             return back()->withErrors(['otp' => 'Mã OTP đã hết hạn. Vui lòng gửi lại.']);
         }
 
         // giới hạn số lần thử (ví dụ 5 lần)
-        if ($user->otp_attempts >= 5) {
+        if ($user_login->otp_attempts >= 5) {
             return back()->withErrors(['otp' => 'Bạn đã thử quá nhiều lần. Vui lòng gửi lại mã OTP.']);
         }
 
         // compare hash
-        if (!Hash::check($request->otp, $user->otp_hash)) {
-            $user->increment('otp_attempts');
+        if (!Hash::check($request->otp, $user_login->otp_hash)) {
+            $user_login->increment('otp_attempts');
             return back()->withErrors(['otp' => 'Mã OTP không đúng.'])->withInput();
         }
 
         // nếu đúng: đánh dấu verified & xoá OTP
-        $user->update([
+        $user_login->update([
             'is_verified' => true,
             'otp_hash' => null,
             'otp_expires_at' => null,
@@ -108,7 +114,7 @@ class AuthController extends Controller
 
         // tùy: auto login user với guard tương ứng
         // Auth::guard('user_login')->login($user);
-
+        $this->userService->createUserByRegister($user_login->id);
         return redirect('/index')->with('success', 'Xác thực thành công! Bạn có thể đăng nhập.');
     }
 

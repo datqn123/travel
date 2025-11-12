@@ -3,3 +3,10 @@
 body {
     font-family: "Bricolage Grotesque", sans-serif;
 }
+
+.fire-gradient {
+  background: linear-gradient(45deg, red, orange, yellow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 18px; /* chỉnh kích thước tùy thích */
+}
