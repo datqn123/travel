@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Users;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class UserService
 {
@@ -17,6 +18,11 @@ class UserService
     public function createUserByRegister(int|string $login_Id) {
         $user = new Users();
         $user->login_id = $login_Id;
+        $user->role = 'user';
         $user->save();
+    }
+
+    public function get_profile(int $login_id) {
+        return $this->repo->getProfile($login_id);
     }
 }

@@ -5,6 +5,7 @@ use App\Models\Users;
 
 interface UserRepositoryInterface{
     public function createUserByRegiter(Users $user);
+    public function getProfile(int $login_id);
 }
 
 

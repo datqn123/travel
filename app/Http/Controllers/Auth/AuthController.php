@@ -121,4 +121,11 @@ class AuthController extends Controller
     public function show_verify_otp() {
         return view('auth.verify_otp');
     }
+
+    public function logout(Request $request) {
+        Auth::guard('user_login')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
+    }
 }

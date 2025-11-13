@@ -38,7 +38,7 @@
 
                 <!-- Thông tin -->
                 <div class="flex items-center space-x-2 text-sm font-medium">
-                    <span>{{ Auth::guard('user_login')->user()->name ?? 'Nguyen Chi Dat' }}</span>
+                    <span>{{$profile->user_login->email}}</span>
                     <span class="flex items-center text-yellow-300">
                         <i class="fa-solid fa-coins mr-1"></i>
                         {{ Auth::guard('user_login')->user()->points ?? 0 }} Điểm

@@ -21,6 +21,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/verify-otp', 'show_verify_otp')->name('register.show-verify-otp');
     Route::post('/verify-otp', 'verifyOtp')->name('register.verify-otp');
     Route::post('/login', 'login')->name('user.login');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 Route::controller(PageController::class)->group(function () {

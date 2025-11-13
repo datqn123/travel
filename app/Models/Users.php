@@ -22,5 +22,7 @@ class Users extends Model
         'role',
     ];
 
-
+    public function user_login() {
+        return $this->belongsTo(UserLogin::class, 'login_id', 'id');
+    }
 }
